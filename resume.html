@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume — Abhinan Sajeendran</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --border: #ffffff0f; --accent: #7fff9a; --accent2: #00c8ff;
+      --text: #e8e8f0; --muted: #888899; --card-bg: #13131c; --surface2: #1a1a24;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.4;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(10,10,15,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--accent); letter-spacing: 0.08em; text-decoration: none; }
+    .nav-back { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-back:hover { color: var(--accent); }
+
+    /* Page header */
+    .resume-header {
+      padding: 8rem 8vw 4rem; position: relative;
+      border-bottom: 1px solid var(--border); overflow: hidden;
+    }
+    .resume-header-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 90% 50%, rgba(127,255,154,0.05) 0%, transparent 70%);
+    }
+    .resume-header-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .header-inner { position: relative; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; }
+    .header-left {}
+    .header-tag { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.8rem; }
+    .header-name { font-family: 'DM Serif Display', serif; font-size: clamp(3rem, 7vw, 5.5rem); line-height: 1.0; margin-bottom: 0.5rem; }
+    .header-name em { font-style: italic; color: var(--accent); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: clamp(1rem, 2.5vw, 1.5rem); color: var(--muted); font-style: italic; }
+    .header-contact { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; }
+    .contact-item { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; text-decoration: none; transition: color 0.2s; }
+    .contact-item:hover { color: var(--accent); }
+
+    /* Main layout */
+    .resume-body { max-width: 1000px; margin: 0 auto; padding: 5rem 3rem; display: grid; grid-template-columns: 1fr 320px; gap: 5rem; align-items: start; }
+
+    /* Sections */
+    .section { margin-bottom: 3.5rem; }
+    .section:last-child { margin-bottom: 0; }
+    .section-label {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent);
+      letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
+    }
+
+    /* Education */
+    .edu-item { margin-bottom: 0; }
+    .edu-school { font-family: 'DM Serif Display', serif; font-size: 1.2rem; margin-bottom: 0.2rem; }
+    .edu-degree { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.4rem; }
+    .edu-meta { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+    .edu-courses { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .edu-courses strong { color: var(--text); font-weight: 500; }
+
+    /* Experience */
+    .exp-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .exp-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .exp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+    .exp-role { font-family: 'DM Serif Display', serif; font-size: 1.1rem; }
+    .exp-date { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; white-space: nowrap; padding-top: 0.3rem; }
+    .exp-org { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.8rem; }
+    .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .exp-bullets li { font-size: 0.88rem; color: var(--muted); line-height: 1.7; padding-left: 1.2rem; position: relative; }
+    .exp-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
+
+    /* Projects */
+    .proj-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+    .proj-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .proj-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+    .proj-name { font-family: 'DM Serif Display', serif; font-size: 1.1rem; }
+    .proj-date { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.06em; white-space: nowrap; padding-top: 0.3rem; }
+    .proj-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.6rem; }
+    .proj-bullets li { font-size: 0.88rem; color: var(--muted); line-height: 1.7; padding-left: 1.2rem; position: relative; }
+    .proj-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--accent2); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
+
+    /* Sidebar */
+    .sidebar {}
+    .skill-section { margin-bottom: 2.5rem; }
+    .skill-section:last-child { margin-bottom: 0; }
+    .skill-heading { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+    .skill-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .skill-tag { font-family: 'DM Mono', monospace; font-size: 0.68rem; padding: 0.22rem 0.6rem; border: 1px solid var(--border); color: var(--muted); border-radius: 2px; }
+
+    .cert-item { margin-bottom: 1rem; }
+    .cert-name { font-size: 0.88rem; color: var(--text); font-weight: 500; margin-bottom: 0.1rem; }
+    .cert-date { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.06em; }
+
+    footer { border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .resume-header { padding: 7rem 1.5rem 3rem; }
+      .header-inner { flex-direction: column; align-items: flex-start; }
+      .header-contact { align-items: flex-start; }
+      .resume-body { grid-template-columns: 1fr; padding: 3rem 1.5rem; gap: 3rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+
+    @media print {
+      nav, footer, body::before { display: none; }
+      body { background: #fff; color: #000; }
+      .resume-header { background: #fff; padding: 2rem; }
+      .resume-header-bg, .resume-header-grid { display: none; }
+      .header-name em, .section-label, .exp-org, .proj-bullets li::before, .exp-bullets li::before { color: #1a7a3a; }
+      .resume-body { padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="index.html">AS — Portfolio</a>
+    <a class="nav-back" href="index.html">← Back</a>
+  </nav>
+
+  <div class="resume-header">
+    <div class="resume-header-bg"></div>
+    <div class="resume-header-grid"></div>
+    <div class="header-inner">
+      <div class="header-left">
+        <p class="header-tag">Curriculum Vitae</p>
+        <h1 class="header-name">Abhinan <em>Sajeendran</em></h1>
+        <p class="header-title">Biomedical &amp; Electrical Engineering · Carleton University</p>
+      </div>
+      <div class="header-contact">
+        <a class="contact-item" href="tel:6137938152">613-793-8152</a>
+        <a class="contact-item" href="mailto:abhinansajeendran@gmail.com">abhinansajeendran@gmail.com</a>
+        <a class="contact-item" href="https://linkedin.com/in/abhinansajeendran" target="_blank">linkedin.com/in/abhinansajeendran</a>
+        <a class="contact-item" href="https://github.com/AbhinanS26" target="_blank">github.com/AbhinanS26</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="resume-body">
+
+    <!-- LEFT COLUMN -->
+    <div class="main-col">
+
+      <!-- Education -->
+      <div class="section">
+        <p class="section-label">Education</p>
+        <div class="edu-item">
+          <h2 class="edu-school">Carleton University</h2>
+          <p class="edu-degree">B.Eng. Biomedical and Electrical Engineering</p>
+          <p class="edu-meta">Ottawa, ON · Sept. 2023 – Apr. 2027 (Expected)</p>
+          <p class="edu-courses"><strong>Relevant Coursework:</strong> Digital Electronics, Bioelectrical Systems, Circuits and Signals, Electronics I, Switching Circuits, Control Systems, Biomedical Systems Modeling and Control, Electromagnetic Fields</p>
+        </div>
+      </div>
+
+      <!-- Engineering Experience -->
+      <div class="section">
+        <p class="section-label">Engineering Experience</p>
+
+        <div class="exp-item">
+          <div class="exp-header">
+            <h3 class="exp-role">Volunteer Research Assistant</h3>
+            <span class="exp-date">May 2026 – Present</span>
+          </div>
+          <p class="exp-org">SHaRe Lab · Carleton University · Ottawa, ON</p>
+          <ul class="exp-bullets">
+            <li>Contributing to the Spiking Neural Network (SNN) team under Dr. Arash Ahmadi researching neuromorphic computing systems that emulate biological neuronal dynamics for low-power adaptive computing</li>
+          </ul>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-header">
+            <h3 class="exp-role">Electrical Team Member</h3>
+            <span class="exp-date">Sept. 2024 – Apr. 2026</span>
+          </div>
+          <p class="exp-org">BIOCARE · Carleton University · Ottawa, ON</p>
+          <ul class="exp-bullets">
+            <li>Contributing to the electrical subsystem of a myoelectric prosthetic device using surface EMG signals to drive actuators for gesture control</li>
+            <li>Designed and tested analog front-end circuits including instrumentation amplifiers and bandpass filters to condition raw muscle signals</li>
+            <li>Collaborated with mechanical and software teams in weekly design reviews aligning electrical decisions with system requirements</li>
+          </ul>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-header">
+            <h3 class="exp-role">Lifeguard &amp; Swim Instructor</h3>
+            <span class="exp-date">2022 – Present</span>
+          </div>
+          <p class="exp-org">City of Ottawa · Ottawa, ON</p>
+          <ul class="exp-bullets">
+            <li>Certified lifeguard and swim instructor teaching preschool to advanced levels</li>
+            <li>Developed strong communication and leadership skills through structured instruction and emergency response training</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Projects -->
+      <div class="section">
+        <p class="section-label">Projects</p>
+
+        <div class="proj-item">
+          <div class="proj-header">
+            <h3 class="proj-name">FPGA Image Colorizer</h3>
+            <span class="proj-date">Jan. 2026 – Apr. 2026</span>
+          </div>
+          <ul class="proj-bullets">
+            <li>Designed an FPGA-based image colorizer in SystemVerilog integrating BRAM memory, UART TX/RX, and a command interpreter FSM into a complete processing pipeline</li>
+            <li>Implemented an RGB calculation datapath applying user-defined weights to 8-bit grayscale pixels with saturation clamping, verified across 15+ weight combinations in simulation</li>
+            <li>Validated full system on FPGA hardware streaming 49,152 bytes over UART at 115200 baud with 0 bytes lost, confirmed via TeraTerm binary logging</li>
+          </ul>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-header">
+            <h3 class="proj-name">EMG Signal Acquisition and Control System</h3>
+            <span class="proj-date">Sept. 2025 – Dec. 2025</span>
+          </div>
+          <ul class="proj-bullets">
+            <li>Designed and simulated an 8-stage analog EMG system in LTSpice including bioinstrumentation amplifier, bandpass filter, rectifier, integrator, comparator, and optoisolator</li>
+            <li>Translated to a breadboard prototype iterating on component values to achieve reliable EMG signal conditioning and threshold detection</li>
+            <li>Validated end-to-end by using muscle contraction signals to trigger a mouse click through an optoisolator interface controlling a real-time application</li>
+          </ul>
+        </div>
+
+        <div class="proj-item">
+          <div class="proj-header">
+            <h3 class="proj-name">Simulated Non-Linear Inverted Pendulum Stabilization</h3>
+            <span class="proj-date">Nov. 2025 – Dec. 2025</span>
+          </div>
+          <ul class="proj-bullets">
+            <li>Modeled a non-linear inverted pendulum in Simulink deriving equations of motion and implementing a PD controller for closed-loop stabilization</li>
+            <li>Linearized the system to select Kp and Kd targeting damping ratio ζ = 0.7 and natural frequency ωn = 10 rad/s</li>
+            <li>Validated stability across 4 initial angles (5°, 30°, 35°, 50°) and designed a lowpass filter to attenuate derivative noise</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN / SIDEBAR -->
+    <div class="sidebar">
+
+      <div class="skill-section">
+        <p class="skill-heading">Hardware &amp; Testing</p>
+        <div class="skill-list">
+          <span class="skill-tag">Analog Circuits</span>
+          <span class="skill-tag">Digital Circuits</span>
+          <span class="skill-tag">PCB Design</span>
+          <span class="skill-tag">Oscilloscopes</span>
+          <span class="skill-tag">Multimeters</span>
+          <span class="skill-tag">Prototype Validation</span>
+          <span class="skill-tag">Wire Crimping</span>
+          <span class="skill-tag">LTSpice</span>
+          <span class="skill-tag">Altium Designer</span>
+        </div>
+      </div>
+
+      <div class="skill-section">
+        <p class="skill-heading">FPGA &amp; Digital Systems</p>
+        <div class="skill-list">
+          <span class="skill-tag">SystemVerilog</span>
+          <span class="skill-tag">Verilog</span>
+          <span class="skill-tag">Vivado</span>
+          <span class="skill-tag">Vitis</span>
+          <span class="skill-tag">Finite State Machines</span>
+          <span class="skill-tag">Simulation Testbenches</span>
+          <span class="skill-tag">FPGA Deployment</span>
+        </div>
+      </div>
+
+      <div class="skill-section">
+        <p class="skill-heading">Systems &amp; Simulation</p>
+        <div class="skill-list">
+          <span class="skill-tag">MATLAB</span>
+          <span class="skill-tag">Simulink</span>
+          <span class="skill-tag">Control Systems</span>
+          <span class="skill-tag">Dynamic Motion Analysis</span>
+          <span class="skill-tag">Spec-Driven Design</span>
+        </div>
+      </div>
+
+      <div class="skill-section">
+        <p class="skill-heading">Programming &amp; Tools</p>
+        <div class="skill-list">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">C / C++</span>
+          <span class="skill-tag">Bash</span>
+          <span class="skill-tag">LaTeX</span>
+          <span class="skill-tag">Git</span>
+          <span class="skill-tag">Fusion 360</span>
+          <span class="skill-tag">Microsoft Office</span>
+        </div>
+      </div>
+
+      <div class="skill-section">
+        <p class="skill-heading">Certifications</p>
+        <div class="cert-item">
+          <p class="cert-name">TCPS 2 CORE 2022 Research Ethics</p>
+          <p class="cert-date">Jan. 2026</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+
+</body>
+</html>
