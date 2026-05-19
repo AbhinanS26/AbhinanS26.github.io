@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abhinan Sajeendran — Engineering Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24;
+      --border: #ffffff0f; --accent: #7fff9a; --accent2: #00c8ff;
+      --text: #e8e8f0; --muted: #888899; --card-bg: #13131c;
+    }
+    html { scroll-behavior: smooth; overflow-x: hidden; max-width: 100%; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; width: 100%; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.4;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(10,10,15,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--accent); letter-spacing: 0.08em; text-decoration: none; }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.75rem; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-primary { background: var(--accent); color: #000; font-weight: 500; }
+    .btn-primary:hover { background: #fff; transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .divider { width: 100%; height: 1px; background: var(--border); max-width: 1100px; margin: 0 auto; }
+    .section-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.1; margin-bottom: 3.5rem; }
+    .section-title em { font-style: italic; color: var(--muted); }
+    .tag { font-family: 'DM Mono', monospace; font-size: 0.7rem; padding: 0.25rem 0.65rem; border: 1px solid var(--border); color: var(--muted); border-radius: 2px; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s, transform 0.7s; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .hero { min-height: 100vh; display: flex; align-items: center; padding: 8rem 8vw 4rem; position: relative; overflow: hidden; width: 100%; }
+    .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 80% 20%, rgba(127,255,154,0.06) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0,200,255,0.05) 0%, transparent 70%); }
+    .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; }
+    .hero-content { position: relative; max-width: 900px; }
+    .hero-tag { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.6s 0.2s forwards; }
+    .hero-name { font-family: 'DM Serif Display', serif; font-size: clamp(3.5rem, 8vw, 7rem); line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 0.4rem; opacity: 0; animation: fadeUp 0.7s 0.4s forwards; }
+    .hero-name em { font-style: italic; color: var(--accent); }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.2rem, 3vw, 2rem); color: var(--muted); font-style: italic; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.7s 0.55s forwards; }
+    .hero-desc { font-size: 1.05rem; color: var(--muted); max-width: 520px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.7s 0.7s forwards; line-height: 1.8; }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.7s 0.85s forwards; }
+
+    section { padding: 6rem 3rem; max-width: 1100px; margin: 0 auto; }
+
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .about-text p { color: var(--muted); margin-bottom: 1.2rem; font-size: 1rem; }
+    .about-text p strong { color: var(--text); font-weight: 500; }
+    .skills-list { display: flex; flex-direction: column; gap: 1.5rem; }
+    .skill-group h4 { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .project-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; padding: 2rem; position: relative; transition: all 0.3s; overflow: hidden; text-decoration: none; display: block; color: var(--text); }
+    .project-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0; transition: opacity 0.3s; }
+    .project-card:hover { border-color: rgba(127,255,154,0.2); transform: translateY(-3px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    .project-card:hover::before { opacity: 1; }
+    .project-number { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent); letter-spacing: 0.15em; margin-bottom: 1.2rem; opacity: 0.7; }
+    .project-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 0.6rem; line-height: 1.2; }
+    .project-subtitle { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem; }
+    .project-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.5rem; }
+    .project-arrow { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+    .project-card:hover .project-arrow { color: var(--accent); }
+
+    .experience-list { display: flex; flex-direction: column; }
+    .exp-item { display: grid; grid-template-columns: 200px 1fr; gap: 3rem; padding: 2.5rem 0; border-bottom: 1px solid var(--border); }
+    .exp-item:last-child { border-bottom: none; }
+    .exp-date { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.08em; padding-top: 0.2rem; }
+    .exp-role { font-family: 'DM Serif Display', serif; font-size: 1.25rem; margin-bottom: 0.2rem; }
+    .exp-company { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.8rem; }
+    .exp-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.75; }
+
+    .contact-wrap { text-align: center; padding: 8rem 3rem; max-width: 100%; margin: 0 auto; }
+    .contact-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+
+    footer { border-top: 1px solid var(--border); padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; }
+    footer p { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      section { padding: 4rem 1.5rem; }
+      .hero { padding: 6rem 1.5rem 3rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="index.html">AS — Portfolio</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-tag">Biomedical &amp; Electrical Engineering · Carleton University</p>
+      <h1 class="hero-name">Abhinan<br /><em>Sajeendran</em></h1>
+      <p class="hero-title">Hardware · Embedded Systems · Signal Processing</p>
+      <p class="hero-desc">Third-year engineering student building at the intersection of analog electronics, digital systems, and biomedical engineering. Currently a Volunteer Research Assistant at SHaRe Lab and Electrical Team Member on BIOCARE, Carleton's myoelectric prosthetics team.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#projects">View Projects</a>
+        <a class="btn btn-ghost" href="#contact">Get In Touch</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <section id="about">
+    <p class="section-label reveal">01 — About</p>
+    <h2 class="section-title reveal">Engineer by discipline,<br /><em>builder by instinct</em></h2>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm a <strong>third-year Biomedical and Electrical Engineering student</strong> at Carleton University in Ottawa, expected to graduate April 2027. My work spans analog circuit design, FPGA development, and embedded systems.</p>
+        <p>I'm a <strong>Volunteer Research Assistant at SHaRe Lab</strong> under Dr. Arash Ahmadi, contributing to the Spiking Neural Network (SNN) team researching neuromorphic computing systems that emulate biological neuronal dynamics for low-power adaptive computing.</p>
+        <p>As an <strong>Electrical Team Member on BIOCARE</strong>, Carleton's myoelectric prosthetics team, I design and test analog front-end circuits to condition raw EMG signals for prosthetic gesture control.</p>
+        <p>I'm actively seeking <strong>engineering internships for Summer 2026</strong> in embedded systems, hardware design, and signal processing. I hold a <strong>TCPS 2 CORE 2022 Research Ethics</strong> certification.</p>
+      </div>
+      <div class="skills-list reveal">
+        <div class="skill-group">
+          <h4>Hardware &amp; Electronics</h4>
+          <div class="skill-tags">
+            <span class="tag">LTSpice</span><span class="tag">Analog Circuits</span><span class="tag">PCB Design</span><span class="tag">Altium Designer</span><span class="tag">Oscilloscopes</span><span class="tag">Prototype Validation</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>FPGA &amp; Embedded</h4>
+          <div class="skill-tags">
+            <span class="tag">SystemVerilog</span><span class="tag">Vivado / Vitis</span><span class="tag">MicroBlaze</span><span class="tag">AXI / AXI-Stream</span><span class="tag">FSM Design</span><span class="tag">BRAM</span><span class="tag">UART</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Systems &amp; Simulation</h4>
+          <div class="skill-tags">
+            <span class="tag">MATLAB</span><span class="tag">Simulink</span><span class="tag">Control Systems</span><span class="tag">HFSS</span><span class="tag">Fusion 360</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Software</h4>
+          <div class="skill-tags">
+            <span class="tag">Python</span><span class="tag">C / C++</span><span class="tag">Bash</span><span class="tag">LaTeX</span><span class="tag">Git</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="projects">
+    <p class="section-label reveal">02 — Projects</p>
+    <h2 class="section-title reveal">Selected <em>technical work</em></h2>
+    <div class="projects-grid">
+
+      <a class="project-card reveal" href="projects/emg.html">
+        <p class="project-number">Project 01 · Sep–Dec 2025</p>
+        <h3 class="project-title">EMG Signal Acquisition &amp; Control System</h3>
+        <p class="project-subtitle">Analog Circuit Design · Biomedical</p>
+        <p class="project-desc">8-stage fully analog EMG acquisition system designed in LTSpice and built on breadboard — validated end-to-end to trigger a mouse click via optoisolator from muscle contraction to play Flappy Bird.</p>
+        <div class="project-tags">
+          <span class="tag">LTSpice</span><span class="tag">Instr. Amp</span><span class="tag">Chebyshev BPF</span><span class="tag">555 Timer</span><span class="tag">Optoisolator</span>
+        </div>
+        <span class="project-arrow">View Project →</span>
+      </a>
+
+      <a class="project-card reveal" href="projects/fpga-colorizer.html">
+        <p class="project-number">Project 02 · Jan–Apr 2026</p>
+        <h3 class="project-title">FPGA Image Colorizer</h3>
+        <p class="project-subtitle">FPGA · SystemVerilog · Digital Design</p>
+        <p class="project-desc">Real-time grayscale-to-color image processing pipeline in SystemVerilog on a Nexys A7-100T. Dual-FSM colorizer core with UART command interface, BRAM pixel storage — streaming 49,152 bytes at 115200 baud with 0 bytes lost.</p>
+        <div class="project-tags">
+          <span class="tag">SystemVerilog</span><span class="tag">Nexys A7-100T</span><span class="tag">Dual FSM</span><span class="tag">BRAM</span><span class="tag">UART</span><span class="tag">ILA</span>
+        </div>
+        <span class="project-arrow">View Project →</span>
+      </a>
+
+      <a class="project-card reveal" href="projects/microblaze.html">
+        <p class="project-number">Project 03 · Mar 2026</p>
+        <h3 class="project-title">MicroBlaze HW-SW Co-Design &amp; FPGA Accelerator</h3>
+        <p class="project-subtitle">Embedded Systems · AXI · Hardware Acceleration</p>
+        <p class="project-desc">Embedded MicroBlaze SoC with AXI GPIO LED control and a custom 16-bit dot product hardware accelerator achieving 160× speedup over the embedded CPU at n=4096 vector size.</p>
+        <div class="project-tags">
+          <span class="tag">MicroBlaze</span><span class="tag">AXI-Stream</span><span class="tag">DMA</span><span class="tag">Vitis</span><span class="tag">C</span><span class="tag">160× Speedup</span>
+        </div>
+        <span class="project-arrow">View Project →</span>
+      </a>
+
+      <a class="project-card reveal" href="projects/pendulum.html">
+        <p class="project-number">Project 04 · Nov–Dec 2025</p>
+        <h3 class="project-title">Inverted Pendulum Stabilization</h3>
+        <p class="project-subtitle">Control Systems · Simulink · Nonlinear Dynamics</p>
+        <p class="project-desc">Nonlinear inverted pendulum modeled and stabilized in Simulink using a PD controller. Linearized system for gain selection targeting ζ=0.7 and ωn=10 rad/s, validated across four initial angles.</p>
+        <div class="project-tags">
+          <span class="tag">Simulink</span><span class="tag">PD Control</span><span class="tag">Linearization</span><span class="tag">MATLAB</span>
+        </div>
+        <span class="project-arrow">View Project →</span>
+      </a>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="experience">
+    <p class="section-label reveal">03 — Experience</p>
+    <h2 class="section-title reveal">Where I've <em>worked</em></h2>
+    <div class="experience-list">
+
+      <div class="exp-item reveal">
+        <div class="exp-date">May 2026 — Present</div>
+        <div>
+          <h3 class="exp-role">Volunteer Research Assistant</h3>
+          <p class="exp-company">SHaRe Lab · Carleton University</p>
+          <p class="exp-desc">Contributing to the Spiking Neural Network (SNN) team under Dr. Arash Ahmadi, researching neuromorphic computing systems that emulate biological neuronal dynamics for low-power adaptive computing applications.</p>
+        </div>
+      </div>
+
+      <div class="exp-item reveal">
+        <div class="exp-date">Sep 2024 — Apr 2026</div>
+        <div>
+          <h3 class="exp-role">Electrical Team Member</h3>
+          <p class="exp-company">BIOCARE · Carleton University</p>
+          <p class="exp-desc">Contributed to the electrical subsystem of a myoelectric prosthetic device using surface EMG signals to drive actuators for gesture control. Designed and tested analog front-end circuits including instrumentation amplifiers and bandpass filters. Collaborated with mechanical and software teams in weekly design reviews aligning electrical decisions with system requirements.</p>
+        </div>
+      </div>
+
+      <div class="exp-item reveal">
+        <div class="exp-date">2022 — Present</div>
+        <div>
+          <h3 class="exp-role">Lifeguard &amp; Swim Instructor</h3>
+          <p class="exp-company">City of Ottawa</p>
+          <p class="exp-desc">Certified lifeguard and swim instructor teaching preschool through advanced levels. Developed strong communication and leadership skills through structured instruction and emergency response training.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <div class="contact-wrap" id="contact">
+    <p class="section-label reveal" style="text-align:center;">04 — Contact</p>
+    <h2 class="section-title reveal" style="font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); margin-bottom:1.5rem; text-align:center;">Let's <em style="font-style:italic;color:var(--muted);">connect</em></h2>
+    <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto 3rem; text-align:center;">I'm actively looking for engineering internships for Summer 2026. If you're working on something interesting in embedded systems, hardware, or biomedical engineering — reach out.</p>
+    <div class="contact-links reveal">
+      <a class="btn btn-primary" href="mailto:abhinansajeendran@gmail.com">Email Me</a>
+      <a class="btn btn-ghost" href="https://linkedin.com/in/abhinansajeendran" target="_blank">LinkedIn ↗</a>
+      <a class="btn btn-ghost" href="https://github.com/AbhinanS26" target="_blank">GitHub ↗</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
