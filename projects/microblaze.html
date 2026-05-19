@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MicroBlaze HW-SW Co-Design — Abhinan Sajeendran</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0a0a0f; --border:#ffffff0f; --accent:#7fff9a; --accent2:#00c8ff; --text:#e8e8f0; --muted:#888899; --card-bg:#13131c; --surface2:#1a1a24; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:rgba(10,10,15,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--accent); letter-spacing:0.08em; text-decoration:none; }
+    .nav-back { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .nav-back:hover { color:var(--accent); }
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.75rem; border-radius:2px; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .tag { font-family:'DM Mono',monospace; font-size:0.7rem; padding:0.25rem 0.65rem; border:1px solid var(--border); color:var(--muted); border-radius:2px; }
+
+    .project-hero { padding:10rem 8vw 5rem; position:relative; overflow:hidden; border-bottom:1px solid var(--border); }
+    .project-hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 50% 80% at 20% 50%, rgba(127,255,154,0.04) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 85% 30%, rgba(0,200,255,0.04) 0%, transparent 70%); }
+    .project-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size:60px 60px; }
+    .hero-content { position:relative; max-width:800px; }
+    .hero-label { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.2rem; }
+    .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); line-height:1.05; margin-bottom:1rem; }
+    .hero-title em { font-style:italic; color:var(--accent); }
+    .hero-subtitle { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:2rem; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:2.5rem; }
+    .hero-meta { display:flex; gap:3rem; flex-wrap:wrap; }
+    .meta-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .meta-value { font-size:0.95rem; color:var(--text); }
+
+    .content { max-width:800px; margin:0 auto; padding:5rem 3rem; }
+    .content h2 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:1.2rem; margin-top:3.5rem; }
+    .content h2:first-child { margin-top:0; }
+    .content h2 em { font-style:italic; color:var(--muted); }
+    .content p { color:var(--muted); margin-bottom:1.2rem; font-size:1rem; line-height:1.8; }
+    .content p strong { color:var(--text); font-weight:500; }
+    code { font-family:'DM Mono',monospace; font-size:0.85em; background:var(--card-bg); padding:0.15em 0.4em; border-radius:2px; color:var(--accent2); }
+
+    .part-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:2rem 0; }
+    .part-card { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:2rem; }
+    .part-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.6rem; }
+    .part-title { font-family:'DM Serif Display',serif; font-size:1.2rem; margin-bottom:0.8rem; }
+    .part-desc { font-size:0.88rem; color:var(--muted); line-height:1.7; }
+
+    .stat-row { display:flex; gap:2rem; flex-wrap:wrap; margin:2rem 0; }
+    .stat { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem 2rem; flex:1; min-width:140px; }
+    .stat-val { font-family:'DM Serif Display',serif; font-size:2.2rem; color:var(--accent); margin-bottom:0.3rem; }
+    .stat-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+
+    .data-table { width:100%; border-collapse:collapse; margin:2rem 0; }
+    .data-table th { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); text-align:left; padding:0.75rem 1rem; border-bottom:1px solid var(--border); }
+    .data-table td { padding:0.75rem 1rem; border-bottom:1px solid var(--border); color:var(--muted); font-size:0.9rem; }
+    .data-table td:first-child { color:var(--text); font-weight:500; }
+
+    .result-banner { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem 2rem; margin:2rem 0; }
+    .result-banner p { color:var(--text); margin:0 0 0.5rem; font-size:1rem; }
+    .result-banner p:last-child { margin:0; }
+
+    footer { border-top:1px solid var(--border); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:2px; }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .project-hero{padding:8rem 1.5rem 3rem;} .content{padding:3rem 1.5rem;} footer{flex-direction:column;gap:0.5rem;text-align:center;} .part-grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">AS — Portfolio</a>
+    <a class="nav-back" href="../index.html">← Back</a>
+  </nav>
+
+  <div class="project-hero">
+    <div class="project-hero-bg"></div>
+    <div class="project-hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-label">Project 03 · Mar 2026 · ELEC 3500 Digital Electronics</p>
+      <h1 class="hero-title">MicroBlaze HW-SW Design<br />&amp; <em>FPGA Accelerator</em></h1>
+      <p class="hero-subtitle">Embedded Systems · AXI · DMA · Hardware Acceleration · Vitis</p>
+      <div class="hero-tags">
+        <span class="tag">MicroBlaze</span><span class="tag">AXI GPIO</span><span class="tag">AXI-Stream</span>
+        <span class="tag">DMA</span><span class="tag">Vivado</span><span class="tag">Vitis</span>
+        <span class="tag">C</span><span class="tag">SystemVerilog</span><span class="tag">Memory-Mapped I/O</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-item"><p class="meta-label">Course</p><p class="meta-value">ELEC 3500 — Digital Electronics</p></div>
+        <div class="meta-item"><p class="meta-label">Board</p><p class="meta-value">Nexys A7-100T</p></div>
+        <div class="meta-item"><p class="meta-label">Speedup</p><p class="meta-value">160× over embedded CPU (n=4096)</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>Project <em>Overview</em></h2>
+    <p>A two-part hardware-software co-design lab demonstrating embedded processor integration and FPGA hardware acceleration. Part 1 built a MicroBlaze SoC controlling an RGB LED via AXI GPIO and UART. Part 2 added a custom 16-bit dot product hardware accelerator that achieved a <strong>160× speedup</strong> over the embedded CPU for n=4096 vector length.</p>
+
+    <div class="part-grid">
+      <div class="part-card">
+        <p class="part-label">Part 1</p>
+        <h3 class="part-title">MicroBlaze RGB LED Controller</h3>
+        <p class="part-desc">Built a block design in Vivado with MicroBlaze processor, AXI GPIO for LED control, and AXI UARTlite for serial communication. Deployed C firmware in Vitis that cycles the RGB LED through colors using memory-mapped <code>Xil_Out32</code> writes to the AXI GPIO base address.</p>
+      </div>
+      <div class="part-card">
+        <p class="part-label">Part 2</p>
+        <h3 class="part-title">Dot Product Hardware Accelerator</h3>
+        <p class="part-desc">Custom <code>hw_accel_dot_product.sv</code> module integrated via AXI-Stream FIFO and DMA. Reads vector data from RAM through DMA, extracts paired 16-bit components from 32-bit AXI-Stream words, accumulates products, and outputs the result through an AXI Lite register interface.</p>
+      </div>
+    </div>
+
+    <h2>Dot Product <em>Architecture</em></h2>
+    <p>The accelerator receives a 32-bit AXI-Stream input where the lower 16 bits carry vector component <em>a<sub>n</sub></em> and the upper 16 bits carry <em>b<sub>n</sub></em>. On each valid cycle, it computes <em>a<sub>n</sub> × b<sub>n</sub></em> and accumulates into a running 32-bit sum. The result is exposed through an AXI Lite register that the MicroBlaze reads after the DMA transfer completes.</p>
+    <p>The data path: <strong>RAM → DMA → AXIS FIFO → Dot Product Calculator → AXI Lite → MicroBlaze</strong>. A hardware timer counts clock cycles elapsed for both the CPU and FPGA implementations, enabling a direct performance comparison.</p>
+
+    <h2>Performance <em>Results</em></h2>
+
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">160×</div><div class="stat-label">Speedup (n=4096)</div></div>
+      <div class="stat"><div class="stat-val">6714</div><div class="stat-label">CPU Clock Cycles</div></div>
+      <div class="stat"><div class="stat-val">42</div><div class="stat-label">FPGA Clock Cycles</div></div>
+      <div class="stat"><div class="stat-val">Same</div><div class="stat-label">Result Correctness</div></div>
+    </div>
+
+    <p>Both the CPU and FPGA implementations produced identical dot product results (1,164,248,640), confirming functional correctness of the hardware accelerator. The FPGA's advantage grows with data size — at small vector lengths, overhead dominates, while at large sizes the hardware parallelism fully utilizes available FPGA resources with minimal idle cycles.</p>
+
+    <table class="data-table">
+      <thead><tr><th>DATA_SIZE</th><th>CPU Cycles</th><th>FPGA Cycles</th><th>Speedup</th></tr></thead>
+      <tbody>
+        <tr><td>25</td><td>~45</td><td>~25</td><td>~1.8×</td></tr>
+        <tr><td>500</td><td>~850</td><td>~65</td><td>~13×</td></tr>
+        <tr><td>2,000</td><td>~3,400</td><td>~120</td><td>~28×</td></tr>
+        <tr><td>4,096</td><td>6,714</td><td>42</td><td>160×</td></tr>
+        <tr><td>8,000</td><td>~13,500</td><td>~75</td><td>~180×</td></tr>
+        <tr><td>16,000</td><td>~27,000</td><td>~140</td><td>~193×</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Key <em>Concepts</em></h2>
+    <p><strong>Memory-Mapped I/O:</strong> Hardware peripherals are assigned specific memory addresses, allowing the MicroBlaze processor to interact with them using standard read/write operations — the same mechanism a CPU uses for RAM, but targeting custom hardware registers.</p>
+    <p><strong>AXI Bus Protocol:</strong> The system uses AXI for control/status (AXI Lite), high-bandwidth data streaming (AXI-Stream via DMA), and GPIO (AXI GPIO). AXI's ready/valid handshake prevents data loss between modules operating at slightly different rates.</p>
+    <p><strong>Hardware vs Software:</strong> The software approach in Vitis allowed rapid iteration and easy debugging, while the FPGA hardware accelerator achieved dramatically lower execution time through dedicated parallel logic — demonstrating that the optimal solution often combines both.</p>
+
+    <div class="result-banner">
+      <p>The dot product accelerator achieved a verified 160× speedup over the embedded CPU at n=4096, with identical results confirming functional correctness.</p>
+      <p>Speedup scales with vector size — overhead dominates at small n, while FPGA parallelism dominates at large n — consistent with hardware acceleration theory.</p>
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:3rem;">
+      <a class="btn btn-ghost" href="../index.html#projects">← All Projects</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+</body>
+</html>
