@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inverted Pendulum Stabilization — Abhinan Sajeendran</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0a0a0f; --border:#ffffff0f; --accent:#7fff9a; --accent2:#00c8ff; --text:#e8e8f0; --muted:#888899; --card-bg:#13131c; --surface2:#1a1a24; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:rgba(10,10,15,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--accent); letter-spacing:0.08em; text-decoration:none; }
+    .nav-back { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .nav-back:hover { color:var(--accent); }
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.75rem; border-radius:2px; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .tag { font-family:'DM Mono',monospace; font-size:0.7rem; padding:0.25rem 0.65rem; border:1px solid var(--border); color:var(--muted); border-radius:2px; }
+
+    .project-hero { padding:10rem 8vw 5rem; position:relative; overflow:hidden; border-bottom:1px solid var(--border); }
+    .project-hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 50% 80% at 80% 60%, rgba(127,255,154,0.04) 0%, transparent 70%); }
+    .project-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size:60px 60px; }
+    .hero-content { position:relative; max-width:800px; }
+    .hero-label { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.2rem; }
+    .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); line-height:1.05; margin-bottom:1rem; }
+    .hero-title em { font-style:italic; color:var(--accent); }
+    .hero-subtitle { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:2rem; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:2.5rem; }
+    .hero-meta { display:flex; gap:3rem; flex-wrap:wrap; }
+    .meta-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .meta-value { font-size:0.95rem; color:var(--text); }
+
+    .content { max-width:800px; margin:0 auto; padding:5rem 3rem; }
+    .content h2 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:1.2rem; margin-top:3.5rem; }
+    .content h2:first-child { margin-top:0; }
+    .content h2 em { font-style:italic; color:var(--muted); }
+    .content p { color:var(--muted); margin-bottom:1.2rem; font-size:1rem; line-height:1.8; }
+    .content p strong { color:var(--text); font-weight:500; }
+
+    .spec-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin:2rem 0; }
+    .spec-card { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem; text-align:center; }
+    .spec-val { font-family:'DM Serif Display',serif; font-size:1.8rem; color:var(--accent); margin-bottom:0.3rem; }
+    .spec-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+
+    .steps { display:flex; flex-direction:column; gap:0; margin:2rem 0; }
+    .step { display:grid; grid-template-columns:48px 1fr; gap:1.5rem; padding:1.5rem 0; border-bottom:1px solid var(--border); align-items:start; }
+    .step:last-child { border-bottom:none; }
+    .step-num { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.1em; width:48px; height:48px; border:1px solid var(--border); border-radius:2px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .step-content h4 { font-family:'DM Serif Display',serif; font-size:1.1rem; margin-bottom:0.4rem; }
+    .step-content p { color:var(--muted); font-size:0.88rem; line-height:1.7; margin:0; }
+
+    .angle-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin:2rem 0; }
+    .angle-card { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.2rem; text-align:center; }
+    .angle-val { font-family:'DM Serif Display',serif; font-size:1.6rem; color:var(--accent2); margin-bottom:0.3rem; }
+    .angle-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+    .angle-result { font-size:0.8rem; color:var(--accent); margin-top:0.4rem; }
+
+    .result-banner { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem 2rem; margin:2rem 0; }
+    .result-banner p { color:var(--text); margin:0 0 0.5rem; font-size:1rem; }
+    .result-banner p:last-child { margin:0; }
+
+    footer { border-top:1px solid var(--border); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:2px; }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .project-hero{padding:8rem 1.5rem 3rem;} .content{padding:3rem 1.5rem;} footer{flex-direction:column;gap:0.5rem;text-align:center;} .angle-grid{grid-template-columns:repeat(2,1fr);} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">AS — Portfolio</a>
+    <a class="nav-back" href="../index.html">← Back</a>
+  </nav>
+
+  <div class="project-hero">
+    <div class="project-hero-bg"></div>
+    <div class="project-hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-label">Project 04 · Nov–Dec 2025 · Biomedical Systems Modeling and Control</p>
+      <h1 class="hero-title">Simulated Nonlinear<br /><em>Inverted Pendulum</em> Stabilization</h1>
+      <p class="hero-subtitle">Control Systems · Simulink · PD Control · Nonlinear Dynamics</p>
+      <div class="hero-tags">
+        <span class="tag">Simulink</span><span class="tag">MATLAB</span><span class="tag">PD Controller</span>
+        <span class="tag">Linearization</span><span class="tag">Nonlinear Dynamics</span><span class="tag">Lowpass Filter</span>
+        <span class="tag">Stability Analysis</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-item"><p class="meta-label">Course</p><p class="meta-value">Biomedical Systems Modeling &amp; Control</p></div>
+        <div class="meta-item"><p class="meta-label">Tool</p><p class="meta-value">MATLAB / Simulink</p></div>
+        <div class="meta-item"><p class="meta-label">Validated</p><p class="meta-value">4 initial conditions (5°–50°)</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>Project <em>Overview</em></h2>
+    <p>Modeled and stabilized a nonlinear inverted pendulum system in Simulink, deriving the nonlinear equations of motion from first principles and implementing a PD controller for closed-loop upright stabilization. The system was then linearized around the upright equilibrium to analytically select controller gains, and validated across multiple initial angle conditions.</p>
+
+    <h2>Design <em>Specifications</em></h2>
+    <div class="spec-grid">
+      <div class="spec-card"><div class="spec-val">0.7</div><div class="spec-label">Damping Ratio ζ</div></div>
+      <div class="spec-card"><div class="spec-val">10</div><div class="spec-label">Natural Freq ωn (rad/s)</div></div>
+      <div class="spec-card"><div class="spec-val">PD</div><div class="spec-label">Controller Type</div></div>
+      <div class="spec-card"><div class="spec-val">4</div><div class="spec-label">Validation Cases</div></div>
+    </div>
+
+    <h2>Design <em>Methodology</em></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>Nonlinear Modeling</h4>
+          <p>Derived the full nonlinear equations of motion for the inverted pendulum from Newton-Euler mechanics. Implemented the nonlinear plant model in Simulink using integrator blocks and signal routing.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>Linearization</h4>
+          <p>Linearized the nonlinear system around the upright equilibrium point (θ = 0) using small-angle approximations. The linearized transfer function enabled analytical gain selection using standard second-order system design methods.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>PD Controller Design</h4>
+          <p>Selected Kp and Kd gains by matching the closed-loop characteristic equation to a desired second-order response with damping ratio ζ = 0.7 and natural frequency ωn = 10 rad/s — targeting well-damped, fast settling behavior.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>Derivative Noise Filter</h4>
+          <p>Designed and added a lowpass filter on the derivative channel to attenuate high-frequency noise amplified by the D-term — a practical requirement for real controller implementations where sensor noise is present.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <h4>Validation Across Initial Conditions</h4>
+          <p>Simulated the closed-loop system across four initial angles to assess the controller's effective region of attraction for the nonlinear plant.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Validation <em>Results</em></h2>
+    <p>The PD controller was tested across four initial pendulum angles. The nonlinear system's behavior diverges from the linearized model at larger angles, revealing the limits of linear design applied to a nonlinear plant.</p>
+
+    <div class="angle-grid">
+      <div class="angle-card">
+        <div class="angle-val">5°</div>
+        <div class="angle-label">Initial Angle</div>
+        <div class="angle-result">✓ Stable</div>
+      </div>
+      <div class="angle-card">
+        <div class="angle-val">30°</div>
+        <div class="angle-label">Initial Angle</div>
+        <div class="angle-result">✓ Stable</div>
+      </div>
+      <div class="angle-card">
+        <div class="angle-val">35°</div>
+        <div class="angle-label">Initial Angle</div>
+        <div class="angle-result">✓ Stable</div>
+      </div>
+      <div class="angle-card">
+        <div class="angle-val">50°</div>
+        <div class="angle-label">Initial Angle</div>
+        <div class="angle-result">✓ Stable</div>
+      </div>
+    </div>
+
+    <div class="result-banner">
+      <p>The PD controller successfully stabilized the nonlinear inverted pendulum across all four tested initial conditions (5°, 30°, 35°, 50°).</p>
+      <p>Gain selection via linearization produced a well-damped closed-loop response (ζ=0.7, ωn=10 rad/s). The derivative lowpass filter suppressed noise amplification without significantly degrading transient performance.</p>
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:3rem;">
+      <a class="btn btn-ghost" href="../index.html#projects">← All Projects</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+</body>
+</html>
