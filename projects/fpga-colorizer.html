@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPGA Image Colorizer — Abhinan Sajeendran</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0a0a0f; --border:#ffffff0f; --accent:#7fff9a; --accent2:#00c8ff; --text:#e8e8f0; --muted:#888899; --card-bg:#13131c; --surface2:#1a1a24; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:rgba(10,10,15,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--accent); letter-spacing:0.08em; text-decoration:none; }
+    .nav-back { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .nav-back:hover { color:var(--accent); }
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.75rem; border-radius:2px; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .tag { font-family:'DM Mono',monospace; font-size:0.7rem; padding:0.25rem 0.65rem; border:1px solid var(--border); color:var(--muted); border-radius:2px; }
+
+    .project-hero { padding:10rem 8vw 5rem; position:relative; overflow:hidden; border-bottom:1px solid var(--border); }
+    .project-hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 50% 80% at 90% 50%, rgba(0,200,255,0.05) 0%, transparent 70%); }
+    .project-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size:60px 60px; }
+    .hero-content { position:relative; max-width:800px; }
+    .hero-label { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.2rem; }
+    .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); line-height:1.05; margin-bottom:1rem; }
+    .hero-title em { font-style:italic; color:var(--accent2); }
+    .hero-subtitle { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:2rem; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:2.5rem; }
+    .hero-meta { display:flex; gap:3rem; flex-wrap:wrap; }
+    .meta-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .meta-value { font-size:0.95rem; color:var(--text); }
+
+    .content { max-width:800px; margin:0 auto; padding:5rem 3rem; }
+    .content h2 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:1.2rem; margin-top:3.5rem; }
+    .content h2:first-child { margin-top:0; }
+    .content h2 em { font-style:italic; color:var(--muted); }
+    .content p { color:var(--muted); margin-bottom:1.2rem; font-size:1rem; line-height:1.8; }
+    .content p strong { color:var(--text); font-weight:500; }
+    code { font-family:'DM Mono',monospace; font-size:0.85em; background:var(--card-bg); padding:0.15em 0.4em; border-radius:2px; color:var(--accent2); }
+
+    .module-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:1rem; margin:2rem 0; }
+    .module-card { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem; }
+    .module-num { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.15em; margin-bottom:0.5rem; }
+    .module-name { font-family:'DM Serif Display',serif; font-size:1.05rem; margin-bottom:0.4rem; }
+    .module-detail { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+
+    .fsm-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:2rem 0; }
+    .fsm-card { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem; }
+    .fsm-card.tx { border-left-color:var(--accent2); }
+    .fsm-title { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); margin-bottom:0.8rem; }
+    .fsm-card.tx .fsm-title { color:var(--accent2); }
+    .fsm-states { font-size:0.82rem; color:var(--muted); line-height:1.9; }
+
+    .result-banner { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem 2rem; margin:2rem 0; }
+    .result-banner p { color:var(--text); margin:0; font-size:1rem; }
+
+    .stat-row { display:flex; gap:2rem; flex-wrap:wrap; margin:2rem 0; }
+    .stat { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem 2rem; flex:1; min-width:150px; }
+    .stat-val { font-family:'DM Serif Display',serif; font-size:2rem; color:var(--accent); margin-bottom:0.3rem; }
+    .stat-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+
+    footer { border-top:1px solid var(--border); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:2px; }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .project-hero{padding:8rem 1.5rem 3rem;} .content{padding:3rem 1.5rem;} footer{flex-direction:column;gap:0.5rem;text-align:center;} .fsm-grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">AS — Portfolio</a>
+    <a class="nav-back" href="../index.html">← Back</a>
+  </nav>
+
+  <div class="project-hero">
+    <div class="project-hero-bg"></div>
+    <div class="project-hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-label">Project 02 · Jan–Apr 2026 · ELEC 3500 Digital Electronics</p>
+      <h1 class="hero-title">FPGA <em>Image Colorizer</em></h1>
+      <p class="hero-subtitle">SystemVerilog · Nexys A7-100T · Dual FSM · UART · BRAM</p>
+      <div class="hero-tags">
+        <span class="tag">SystemVerilog</span><span class="tag">Vivado</span><span class="tag">Nexys A7-100T</span>
+        <span class="tag">BRAM</span><span class="tag">UART 115200</span><span class="tag">Dual FSM</span>
+        <span class="tag">ILA Debug</span><span class="tag">RGB Calculator</span><span class="tag">AXI-style Backpressure</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-item"><p class="meta-label">Course</p><p class="meta-value">ELEC 3500 — Digital Electronics</p></div>
+        <div class="meta-item"><p class="meta-label">Board</p><p class="meta-value">Nexys A7-100T (100 MHz)</p></div>
+        <div class="meta-item"><p class="meta-label">Result</p><p class="meta-value">0 bytes lost · 49,152 bytes streamed</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>Project <em>Overview</em></h2>
+    <p>A complete FPGA-based image processing pipeline that reads a 128×128 grayscale image from on-chip Block RAM, applies user-specified RGB color weights received over UART, and streams the colorized pixel data back to a host computer at 115200 baud. The host reconstructs and displays the full-color image using a binary image reconstruction tool.</p>
+    <p>The design integrates six hardware modules operating at 100 MHz on FPGA fabric, verified through behavioral simulation and confirmed in hardware using an ILA.</p>
+
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">49,152</div><div class="stat-label">Bytes Streamed</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-label">Bytes Lost</div></div>
+      <div class="stat"><div class="stat-val">115,200</div><div class="stat-label">Baud Rate</div></div>
+      <div class="stat"><div class="stat-val">100 MHz</div><div class="stat-label">Clock Speed</div></div>
+    </div>
+
+    <h2>Hardware <em>Modules</em></h2>
+    <div class="module-grid">
+      <div class="module-card">
+        <p class="module-num">Module 01</p>
+        <h3 class="module-name">Baud Rate Generator</h3>
+        <p class="module-detail">NCO accumulator producing 16× oversampling ticks for 115200 baud UART at 100 MHz system clock.</p>
+      </div>
+      <div class="module-card">
+        <p class="module-num">Module 02</p>
+        <h3 class="module-name">UART Receiver</h3>
+        <p class="module-detail">2-FF metastability synchronizer. Samples with 16× oversampling. Outputs validated byte + one-cycle strobe on new data.</p>
+      </div>
+      <div class="module-card">
+        <p class="module-num">Module 03</p>
+        <h3 class="module-name">UART Transmitter</h3>
+        <p class="module-detail">Serializes bytes as 8N1 frames. Asserts <code>o_busy</code> during transmission for backpressure flow control.</p>
+      </div>
+      <div class="module-card">
+        <p class="module-num">Module 04</p>
+        <h3 class="module-name">Image BRAM</h3>
+        <p class="module-detail">128×128 grayscale image in Block RAM. 1-cycle synchronous read latency explicitly handled in TX FSM with TXS_WAIT_DATA state.</p>
+      </div>
+      <div class="module-card">
+        <p class="module-num">Module 05</p>
+        <h3 class="module-name">RGB Calculator</h3>
+        <p class="module-detail">Combinational. Computes R/G/B = min(I × W / 16, 255) using 13-bit multiplication, 4-bit right shift, and saturation logic.</p>
+      </div>
+      <div class="module-card">
+        <p class="module-num">Module 06</p>
+        <h3 class="module-name">Colorizer Core</h3>
+        <p class="module-detail">Dual-FSM central controller. Command FSM + TX FSM in a single clocked process to eliminate multiple-driver risk on shared signals.</p>
+      </div>
+    </div>
+
+    <h2>Dual-FSM <em>Architecture</em></h2>
+    <p>The colorizer core contains two FSMs implemented in a single <code>always_ff</code> block to safely share internal state. The <code>tx_start</code> flag is set by the Command FSM and consumed by the TX FSM without race conditions.</p>
+
+    <div class="fsm-grid">
+      <div class="fsm-card">
+        <p class="fsm-title">Command FSM — 12 States</p>
+        <div class="fsm-states">
+          CMD_IDLE → CMD_S_WAIT_CR<br/>
+          CMD_R_D1 → CMD_R_D2 → CMD_R_CR<br/>
+          CMD_G_D1 → CMD_G_D2 → CMD_G_CR<br/>
+          CMD_B_D1 → CMD_B_D2 → CMD_B_CR<br/>
+          CMD_RUNNING
+        </div>
+      </div>
+      <div class="fsm-card tx">
+        <p class="fsm-title">TX FSM — 10 States</p>
+        <div class="fsm-states">
+          TXS_IDLE → TXS_ADDR<br/>
+          TXS_WAIT_DATA → TXS_SEND_R<br/>
+          TXS_WAIT_R → TXS_SEND_G<br/>
+          TXS_WAIT_G → TXS_SEND_B<br/>
+          TXS_WAIT_B → TXS_NEXT
+        </div>
+      </div>
+    </div>
+
+    <h2>UART Command <em>Interface</em></h2>
+    <p>The user sets RGB weights and triggers transmission via ASCII commands over UART. The command FSM parses incoming bytes, collects weight digits, converts ASCII to binary, clamps values to [0, 31], and stores in weight registers.</p>
+    <p>Example: <code>r18&lt;CR&gt;g04&lt;CR&gt;b23&lt;CR&gt;s&lt;CR&gt;</code> sets WR=18, WG=4, WB=23 and starts the transmission. Simulation verified R=182, G=40, B=232 for the reference pixel I=162 — matching the lab specification exactly.</p>
+
+    <h2>Verification &amp; <em>Hardware Testing</em></h2>
+    <p>A comprehensive SystemVerilog testbench sent the full command sequence over simulated UART, verified correct RGB byte ordering and values for multiple pixels, and confirmed pass_count incremented with fail_count at zero throughout all test assertions.</p>
+    <p>The ILA was connected to FSM states, RGB weight registers, UART strobe/busy signals, and BRAM address/data — enabling real-time hardware observation. The colorized output was reconstructed from the captured binary file and visually verified across multiple weight configurations.</p>
+
+    <div class="result-banner">
+      <p>The system successfully streamed a full 128×128 RGB image — 49,152 bytes — at 115200 baud with 0 bytes lost, confirmed via TeraTerm binary logging. The colorized output matched simulation predictions for all tested weight combinations.</p>
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:3rem;">
+      <a class="btn btn-ghost" href="../index.html#projects">← All Projects</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+</body>
+</html>
