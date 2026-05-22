@@ -26,7 +26,6 @@
       background: rgba(10,10,15,0.85); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
-    .nav-logo { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--accent); letter-spacing: 0.08em; text-decoration: none; }
     .nav-links { display: flex; gap: 2.5rem; list-style: none; }
     .nav-links a { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
     .nav-links a:hover { color: var(--text); }
@@ -109,7 +108,7 @@
 </head>
 <body>
 
-<nav>
+  <nav>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
@@ -226,6 +225,17 @@
         <span class="project-arrow">View Project →</span>
       </a>
 
+      <a class="project-card reveal" href="projects/moving-average.html">
+        <p class="project-number">Project 05 · Mar 2026</p>
+        <h3 class="project-title">FPGA Moving Average Functional Verification</h3>
+        <p class="project-subtitle">SystemVerilog · UVM-Style Testbench · BRAM</p>
+        <p class="project-desc">Debugged and verified an 8-point moving average processor using an industry-style verification environment with driver, monitor, and scoreboard components — 1,017 outputs checked with 0 mismatches.</p>
+        <div class="project-tags">
+          <span class="tag">SystemVerilog</span><span class="tag">Scoreboard</span><span class="tag">BRAM</span><span class="tag">FSM Debug</span><span class="tag">Mailbox IPC</span>
+        </div>
+        <span class="project-arrow">View Project →</span>
+      </a>
+
     </div>
   </section>
 
@@ -271,7 +281,7 @@
   <div class="contact-wrap" id="contact">
     <p class="section-label reveal" style="text-align:center;">04 — Contact</p>
     <h2 class="section-title reveal" style="font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); margin-bottom:1.5rem; text-align:center;">Let's <em style="font-style:italic;color:var(--muted);">connect</em></h2>
-    <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto 3rem; text-align:center;">I'm actively looking for engineering internships for Summer 2026. If you're working on something interesting in embedded systems, hardware, or biomedical engineering — reach out.</p>
+    <p class="reveal" style="color:var(--muted); max-width:480px; margin:0 auto 3rem; text-align:center;">I'm actively looking for engineering internships for Fall 2026. If you're working on something interesting in embedded systems, hardware, or biomedical engineering — reach out.</p>
     <div class="contact-links reveal">
       <a class="btn btn-primary" href="mailto:abhinansajeendran@gmail.com">Email Me</a>
       <a class="btn btn-ghost" href="https://linkedin.com/in/abhinansajeendran" target="_blank">LinkedIn ↗</a>
