@@ -18,7 +18,6 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none; z-index: 1000; opacity: 0.4;
     }
-
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
@@ -30,7 +29,6 @@
     .nav-back { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
     .nav-back:hover { color: var(--accent); }
 
-    /* Page header */
     .resume-header {
       padding: 8rem 8vw 4rem; position: relative;
       border-bottom: 1px solid var(--border); overflow: hidden;
@@ -45,7 +43,6 @@
       background-size: 60px 60px;
     }
     .header-inner { position: relative; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; }
-    .header-left {}
     .header-tag { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.8rem; }
     .header-name { font-family: 'DM Serif Display', serif; font-size: clamp(3rem, 7vw, 5.5rem); line-height: 1.0; margin-bottom: 0.5rem; }
     .header-name em { font-style: italic; color: var(--accent); }
@@ -54,10 +51,8 @@
     .contact-item { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; text-decoration: none; transition: color 0.2s; }
     .contact-item:hover { color: var(--accent); }
 
-    /* Main layout */
     .resume-body { max-width: 1000px; margin: 0 auto; padding: 5rem 3rem; display: grid; grid-template-columns: 1fr 320px; gap: 5rem; align-items: start; }
 
-    /* Sections */
     .section { margin-bottom: 3.5rem; }
     .section:last-child { margin-bottom: 0; }
     .section-label {
@@ -66,15 +61,12 @@
       padding-bottom: 0.75rem; border-bottom: 1px solid var(--border);
     }
 
-    /* Education */
-    .edu-item { margin-bottom: 0; }
     .edu-school { font-family: 'DM Serif Display', serif; font-size: 1.2rem; margin-bottom: 0.2rem; }
     .edu-degree { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.4rem; }
     .edu-meta { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 0.8rem; }
     .edu-courses { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
     .edu-courses strong { color: var(--text); font-weight: 500; }
 
-    /* Experience */
     .exp-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
     .exp-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
     .exp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
@@ -85,7 +77,6 @@
     .exp-bullets li { font-size: 0.88rem; color: var(--muted); line-height: 1.7; padding-left: 1.2rem; position: relative; }
     .exp-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
 
-    /* Projects */
     .proj-item { margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
     .proj-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
     .proj-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
@@ -95,7 +86,6 @@
     .proj-bullets li { font-size: 0.88rem; color: var(--muted); line-height: 1.7; padding-left: 1.2rem; position: relative; }
     .proj-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--accent2); font-family: 'DM Mono', monospace; font-size: 0.75rem; }
 
-    /* Sidebar */
     .sidebar {}
     .skill-section { margin-bottom: 2.5rem; }
     .skill-section:last-child { margin-bottom: 0; }
@@ -201,6 +191,12 @@
           </ul>
         </div>
 
+      </div>
+
+      <!-- Work Experience -->
+      <div class="section">
+        <p class="section-label">Work Experience</p>
+
         <div class="exp-item">
           <div class="exp-header">
             <h3 class="exp-role">Lifeguard &amp; Swim Instructor</h3>
@@ -208,8 +204,9 @@
           </div>
           <p class="exp-org">City of Ottawa · Ottawa, ON</p>
           <ul class="exp-bullets">
-            <li>Certified lifeguard and swim instructor teaching preschool to advanced levels</li>
-            <li>Developed strong communication and leadership skills through structured instruction and emergency response training</li>
+            <li>Instruct swimming lessons across all levels from preschool to advanced, adapting teaching methods to individual learner needs and progression rates</li>
+            <li>Maintain pool surveillance and enforce aquatic safety protocols, responding to incidents and emergencies with trained first aid and rescue techniques</li>
+            <li>Communicate effectively with parents, facility staff, and program coordinators to ensure a safe, structured, and positive aquatic environment</li>
           </ul>
         </div>
 
