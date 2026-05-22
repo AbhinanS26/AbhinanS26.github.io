@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPGA Moving Average Verification — Abhinan Sajeendran</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0a0a0f; --border:#ffffff0f; --accent:#7fff9a; --accent2:#00c8ff; --text:#e8e8f0; --muted:#888899; --card-bg:#13131c; --surface2:#1a1a24; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:1000; opacity:0.4; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:rgba(10,10,15,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--accent); letter-spacing:0.08em; text-decoration:none; }
+    .nav-back { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .nav-back:hover { color:var(--accent); }
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.75rem; border-radius:2px; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .tag { font-family:'DM Mono',monospace; font-size:0.7rem; padding:0.25rem 0.65rem; border:1px solid var(--border); color:var(--muted); border-radius:2px; }
+
+    .project-hero { padding:10rem 8vw 5rem; position:relative; overflow:hidden; border-bottom:1px solid var(--border); }
+    .project-hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 50% 80% at 85% 40%, rgba(0,200,255,0.05) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 15% 70%, rgba(127,255,154,0.04) 0%, transparent 70%); }
+    .project-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size:60px 60px; }
+    .hero-content { position:relative; max-width:800px; }
+    .hero-label { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.2rem; }
+    .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); line-height:1.05; margin-bottom:1rem; }
+    .hero-title em { font-style:italic; color:var(--accent2); }
+    .hero-subtitle { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:2rem; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:2.5rem; }
+    .hero-meta { display:flex; gap:3rem; flex-wrap:wrap; }
+    .meta-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .meta-value { font-size:0.95rem; color:var(--text); }
+
+    .content { max-width:800px; margin:0 auto; padding:5rem 3rem; }
+    .content h2 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:1.2rem; margin-top:3.5rem; }
+    .content h2:first-child { margin-top:0; }
+    .content h2 em { font-style:italic; color:var(--muted); }
+    .content p { color:var(--muted); margin-bottom:1.2rem; font-size:1rem; line-height:1.8; }
+    .content p strong { color:var(--text); font-weight:500; }
+    code { font-family:'DM Mono',monospace; font-size:0.85em; background:var(--card-bg); padding:0.15em 0.4em; border-radius:2px; color:var(--accent2); }
+
+    .stat-row { display:flex; gap:2rem; flex-wrap:wrap; margin:2rem 0; }
+    .stat { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem 2rem; flex:1; min-width:140px; }
+    .stat-val { font-family:'DM Serif Display',serif; font-size:2.2rem; color:var(--accent); margin-bottom:0.3rem; }
+    .stat-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; }
+
+    .component-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin:2rem 0; }
+    .component-card { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem; }
+    .component-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--accent2); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
+    .component-name { font-family:'DM Serif Display',serif; font-size:1.05rem; margin-bottom:0.4rem; }
+    .component-desc { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+
+    .pipeline { display:flex; align-items:center; gap:0; margin:2rem 0; flex-wrap:wrap; }
+    .pipe-stage { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1rem 1.2rem; text-align:center; flex:1; min-width:100px; }
+    .pipe-stage-label { font-family:'DM Mono',monospace; font-size:0.62rem; color:var(--accent); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .pipe-stage-name { font-size:0.85rem; color:var(--text); }
+    .pipe-arrow { color:var(--muted); font-family:'DM Mono',monospace; padding:0 0.5rem; font-size:1rem; }
+
+    .bug-card { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid #ff6b6b; border-radius:4px; padding:1.5rem 2rem; margin:1rem 0; }
+    .bug-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:#ff6b6b; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
+    .bug-title { font-size:0.95rem; color:var(--text); font-weight:500; margin-bottom:0.4rem; }
+    .bug-desc { font-size:0.88rem; color:var(--muted); line-height:1.7; }
+
+    .fix-card { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem 2rem; margin:1rem 0; }
+    .fix-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--accent); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.5rem; }
+    .fix-desc { font-size:0.88rem; color:var(--muted); line-height:1.7; }
+
+    .result-banner { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem 2rem; margin:2rem 0; }
+    .result-banner p { color:var(--text); margin:0 0 0.5rem; font-size:1rem; }
+    .result-banner p:last-child { margin:0; }
+
+    .tcl-block { background:#0d1117; border:1px solid var(--border); border-radius:4px; padding:1.5rem; margin:2rem 0; font-family:'DM Mono',monospace; font-size:0.78rem; line-height:1.8; color:#8b949e; overflow-x:auto; }
+    .tcl-block .pass { color:var(--accent); }
+    .tcl-block .correct { color:var(--accent2); }
+    .tcl-block .info { color:#e3b341; }
+
+    .math-block { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem 2rem; margin:1.5rem 0; font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--text); line-height:2; }
+
+    footer { border-top:1px solid var(--border); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:2px; }
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .project-hero{padding:8rem 1.5rem 3rem;} .content{padding:3rem 1.5rem;} footer{flex-direction:column;gap:0.5rem;text-align:center;} .pipeline{flex-direction:column;} .pipe-arrow{transform:rotate(90deg);} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">AS — Portfolio</a>
+    <a class="nav-back" href="../index.html">← Back</a>
+  </nav>
+
+  <div class="project-hero">
+    <div class="project-hero-bg"></div>
+    <div class="project-hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-label">Project 05 · Mar 2026 · ELEC 3500 Digital Electronics</p>
+      <h1 class="hero-title">FPGA Moving Average<br /><em>Functional Verification</em></h1>
+      <p class="hero-subtitle">SystemVerilog · UVM-Style Testbench · BRAM · Debug · Scoreboard</p>
+      <div class="hero-tags">
+        <span class="tag">SystemVerilog</span>
+        <span class="tag">Functional Verification</span>
+        <span class="tag">UVM-Style Testbench</span>
+        <span class="tag">BRAM</span>
+        <span class="tag">Scoreboard</span>
+        <span class="tag">Driver / Monitor</span>
+        <span class="tag">FSM Debug</span>
+        <span class="tag">Mailbox IPC</span>
+        <span class="tag">Vivado</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-item"><p class="meta-label">Course</p><p class="meta-value">ELEC 3500 — Digital Electronics</p></div>
+        <div class="meta-item"><p class="meta-label">Design</p><p class="meta-value">8-point moving average processor</p></div>
+        <div class="meta-item"><p class="meta-label">Result</p><p class="meta-value">TEST PASSED — 0 mismatches</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>Project <em>Overview</em></h2>
+    <p>Debugged and verified an 8-point moving average processor using an industry-style SystemVerilog verification environment. The testbench architecture mirrors the UVM (Universal Verification Methodology) pattern used in professional ASIC and FPGA design flows, with a structured driver, monitor, scoreboard, and mailbox-based inter-process communication.</p>
+    <p>The project involved two phases: <strong>Phase 1</strong> — debugging the provided moving average design using the testbench to identify and fix timing bugs; <strong>Phase 2</strong> — integrating a real BRAM model and adding a new testcase that verifies the design end-to-end using data loaded from a memory initialization file.</p>
+
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">1,024</div><div class="stat-label">BRAM Samples Verified</div></div>
+      <div class="stat"><div class="stat-val">1,017</div><div class="stat-label">Moving Avg Outputs Checked</div></div>
+      <div class="stat"><div class="stat-val">0</div><div class="stat-label">Scoreboard Mismatches</div></div>
+      <div class="stat"><div class="stat-val">8-pt</div><div class="stat-label">Window Size</div></div>
+    </div>
+
+    <h2>Moving Average <em>Algorithm</em></h2>
+    <p>The 8-point moving average computes a sliding window sum over the input sequence, producing one output per clock cycle once the window is filled:</p>
+    <div class="math-block">
+      A[n] = ( x[n] + x[n-1] + x[n-2] + x[n-3] + x[n-4] + x[n-5] + x[n-6] + x[n-7] ) / 8
+    </div>
+    <p>The design reads 16-bit unsigned integer samples from a 1024-deep BRAM with <strong>1-cycle synchronous read latency</strong>. The <code>o_valid</code> signal is only asserted after the first 8 samples are consumed. The running sum uses a sliding window buffer — on each new sample, the oldest value is subtracted and the newest is added, keeping computation O(1) per cycle.</p>
+
+    <h2>Verification <em>Architecture</em></h2>
+    <p>The testbench follows a structured UVM-inspired hierarchy with four main components communicating through SystemVerilog mailboxes and a virtual interface. This separates concerns cleanly — stimulus generation, output observation, and result checking are fully decoupled.</p>
+
+    <div class="component-grid">
+      <div class="component-card">
+        <p class="component-label">Component 01</p>
+        <h3 class="component-name">Base Test</h3>
+        <p class="component-desc">Top-level orchestrator. Builds and connects all environment components, selects testcase via <code>test_num</code>, manages reset/start sequences, and reports PASS/FAIL.</p>
+      </div>
+      <div class="component-card">
+        <p class="component-label">Component 02</p>
+        <h3 class="component-name">Driver</h3>
+        <p class="component-desc">Generates input stimulus. In testcase 0, forces BRAM data into the DUT. In testcase 1, sends only the golden dataset to the scoreboard — the actual BRAM drives the DUT.</p>
+      </div>
+      <div class="component-card">
+        <p class="component-label">Component 03</p>
+        <h3 class="component-name">Monitor</h3>
+        <p class="component-desc">Observes DUT outputs — samples <code>o_valid</code> and <code>o_data</code> on each cycle where valid is asserted, and forwards samples to the scoreboard via mailbox.</p>
+      </div>
+      <div class="component-card">
+        <p class="component-label">Component 04</p>
+        <h3 class="component-name">Scoreboard</h3>
+        <p class="component-desc">Compares DUT output against golden reference values computed from the input sequence. Tracks pass/fail count and prints CORRECT or MISMATCH for each output with BRAM address context.</p>
+      </div>
+      <div class="component-card">
+        <p class="component-label">Component 05</p>
+        <h3 class="component-name">BRAM (mem.sv)</h3>
+        <p class="component-desc">1024-deep × 16-bit synchronous Block RAM with 1-cycle read latency. Initialized from <code>init.mem</code> using <code>$readmemh</code>. Write-enable held low during verification.</p>
+      </div>
+      <div class="component-card">
+        <p class="component-label">Component 06</p>
+        <h3 class="component-name">DUT Interface</h3>
+        <p class="component-desc">Virtual interface (<code>dut_if</code>) connecting testbench components to DUT signals. Clocking blocks synchronize stimulus to clock edges. Force/release used to bypass clock/debounce modules in simulation.</p>
+      </div>
+    </div>
+
+    <h2>Data <em>Flow</em></h2>
+    <div class="pipeline">
+      <div class="pipe-stage"><p class="pipe-stage-label">Source</p><p class="pipe-stage-name">init.mem</p></div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-stage"><p class="pipe-stage-label">Memory</p><p class="pipe-stage-name">BRAM</p></div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-stage"><p class="pipe-stage-label">Core</p><p class="pipe-stage-name">Moving Avg FSM</p></div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-stage"><p class="pipe-stage-label">Observer</p><p class="pipe-stage-name">Monitor</p></div>
+      <span class="pipe-arrow">→</span>
+      <div class="pipe-stage"><p class="pipe-stage-label">Checker</p><p class="pipe-stage-name">Scoreboard</p></div>
+    </div>
+
+    <h2>Bug Identification <em>&amp; Debug</em></h2>
+    <p>The provided moving average design contained a timing bug between the <code>always_ff</code> sequential block and the <code>always_comb</code> combinational block. Careful waveform inspection and scoreboard mismatch messages were used to isolate the issue.</p>
+
+    <div class="bug-card">
+      <p class="bug-label">Bug Identified</p>
+      <h4 class="bug-title">BRAM Read Latency Not Accounted For</h4>
+      <p class="bug-desc">The moving average core was consuming BRAM data before it was valid due to the 1-cycle synchronous read latency. The <code>recv_count</code> was advancing in the same cycle that the address was issued, causing the datapath to process stale data — producing incorrect running sums and invalid <code>o_data</code> outputs that the scoreboard flagged as mismatches.</p>
+    </div>
+
+    <div class="fix-card">
+      <p class="fix-label">Fix Applied</p>
+      <p class="fix-desc">The data consumption logic was gated on <code>recv_count &lt; req_count</code> — ensuring that the FSM only processes a sample when the BRAM has had a full cycle to return valid data after the address was issued. This correctly decouples the read request count from the receive count by exactly one cycle, matching the BRAM's synchronous latency specification.</p>
+    </div>
+
+    <h2>Phase 2 — BRAM <em>Testcase Integration</em></h2>
+    <p>After verifying the fixed design with testbench-forced data, a second testcase (<code>test_num = 1</code>) was implemented that uses the actual BRAM model instead of forced stimulus.</p>
+    <p>The steps taken to add the new testcase in <code>base_test.sv</code> were: reset the DUT, call <code>vif.disable_bram_data_force()</code> to release the testbench force on <code>i_bram_data</code>, assert the start signal, then run the driver, monitor, and scoreboard concurrently using a <code>fork...join_any</code> construct. The driver in this mode sends only the golden dataset to the scoreboard — it does not drive the BRAM lines, which are now controlled entirely by the DUT.</p>
+    <p>The <code>mem.sv</code> BRAM module was completed with <code>$readmemh("init.mem", mem)</code> to preload the 1024-sample dataset. The analog waveform view of <code>i_bram_data</code> and <code>o_data</code> confirmed correct moving average behavior — the rough, varying BRAM input produces a smooth, averaged output waveform.</p>
+
+    <h2>Scoreboard <em>Output</em></h2>
+    <p>Representative Tcl console output from the passing simulation:</p>
+    <div class="tcl-block">
+      <span class="info">T=0.00 ns [base_test] Applying Reset</span><br/>
+      <span class="info">T=95.00 ns [base_test] Starting Test</span><br/>
+      <span class="info">T=145.00 ns [DRV] Starting driver...</span><br/>
+      <span class="info">T=145.00 ns [DRV] Depth=1024 Window=8</span><br/>
+      <span class="info">T=145.00 ns [SCB] Expecting 1017 outputs</span><br/>
+      <span class="correct">T=275.00 ns [SCB] CORRECT @0: got 332, expected 332 for values: 53, 723, 159, 326, 997, 72, 284, 49</span><br/>
+      <span class="correct">T=285.00 ns [SCB] CORRECT @1: got 359, expected 359 for values: 723, 159, 326, 997, 72, 284, 49, 264</span><br/>
+      <span class="correct">T=295.00 ns [SCB] CORRECT @2: got 381, expected 381 for values: 159, 326, 997, 72, 284, 49, 264, 903</span><br/>
+      <span class="correct">T=305.00 ns [SCB] CORRECT @3: got 401, expected 401 for values: 326, 997, 72, 284, 49, 264, 903, 313</span><br/>
+      ... (1013 more CORRECT outputs) ...<br/>
+      <span class="pass">T=10895.00 ns [base_test] ================ TEST PASSED ================</span>
+    </div>
+
+    <div class="result-banner">
+      <p>Both testcases passed with 0 scoreboard mismatches across all 1,017 moving average outputs verified from a 1,024-sample BRAM dataset.</p>
+      <p>The verification environment automatically detected and reported the timing bug, and confirmed correct operation after the fix — demonstrating the value of structured, self-checking testbenches over manual waveform inspection.</p>
+    </div>
+
+    <h2>Key <em>Takeaways</em></h2>
+    <p><strong>Structured verification scales:</strong> Adding testcase 1 required minimal effort because the driver, monitor, and scoreboard were already built. Switching from forced stimulus to real BRAM required only disabling the force and updating the test selector — the checker logic was completely reused.</p>
+    <p><strong>BRAM latency is a real constraint:</strong> The 1-cycle synchronous read latency must be explicitly handled in the FSM. Ignoring it causes silent data corruption that is only visible through careful waveform analysis or a self-checking scoreboard.</p>
+    <p><strong>Mailbox-based IPC:</strong> The driver-to-scoreboard and monitor-to-scoreboard mailboxes allow the golden reference and DUT output to be compared asynchronously — neither component needs to know about the other's timing, making the testbench robust to timing variations.</p>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:3rem;">
+      <a class="btn btn-ghost" href="../index.html#projects">← All Projects</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+</body>
+</html>
