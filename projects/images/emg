@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMG Signal Acquisition — Abhinan Sajeendran</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#ffffff; --border:#e2e2e8; --accent:#1a8c3a; --accent2:#0077cc; --text:#0a0a0f; --muted:#555566; --card-bg:#f9f9fb; --surface2:#e8e8ec; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+    body::before { display:none; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:rgba(255,255,255,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:'DM Mono',monospace; font-size:0.85rem; color:var(--accent); letter-spacing:0.08em; text-decoration:none; }
+    .nav-back { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .nav-back:hover { color:var(--accent); }
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.75rem 1.75rem; border-radius:2px; font-family:'DM Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.2s; border:none; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid #c0c0cc; }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .tag { font-family:'DM Mono',monospace; font-size:0.7rem; padding:0.25rem 0.65rem; border:1px solid var(--border); color:var(--muted); border-radius:2px; background:var(--card-bg); }
+
+    .project-hero { padding: 10rem 8vw 5rem; position:relative; overflow:hidden; border-bottom:1px solid var(--border); }
+    .project-hero-bg { position:absolute; inset:0; background:radial-gradient(ellipse 50% 80% at 90% 50%, rgba(26,140,58,0.06) 0%, transparent 70%); }
+    .project-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px); background-size:60px 60px; }
+    .hero-content { position:relative; max-width:800px; }
+    .hero-label { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:1.2rem; }
+    .hero-title { font-family:'DM Serif Display',serif; font-size:clamp(2.5rem,6vw,5rem); line-height:1.05; margin-bottom:1rem; }
+    .hero-title em { font-style:italic; color:var(--accent); }
+    .hero-subtitle { font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--accent2); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:2rem; }
+    .hero-tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:2.5rem; }
+    .hero-meta { display:flex; gap:3rem; flex-wrap:wrap; }
+    .meta-item { }
+    .meta-label { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.3rem; }
+    .meta-value { font-size:0.95rem; color:var(--text); }
+
+    .content { max-width:800px; margin:0 auto; padding:5rem 3rem; }
+    .content h2 { font-family:'DM Serif Display',serif; font-size:2rem; margin-bottom:1.2rem; margin-top:3.5rem; }
+    .content h2:first-child { margin-top:0; }
+    .content h2 em { font-style:italic; color:var(--muted); }
+    .content p { color:var(--muted); margin-bottom:1.2rem; font-size:1rem; line-height:1.8; }
+    .content p strong { color:var(--text); font-weight:500; }
+
+    .stage-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin:2rem 0; }
+    .stage-card { background:var(--card-bg); border:1px solid var(--border); border-radius:4px; padding:1.5rem; }
+    .stage-num { font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--accent); letter-spacing:0.15em; margin-bottom:0.5rem; }
+    .stage-name { font-family:'DM Serif Display',serif; font-size:1.1rem; margin-bottom:0.4rem; }
+    .stage-detail { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+
+    .spec-table { width:100%; border-collapse:collapse; margin:2rem 0; }
+    .spec-table th { font-family:'DM Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); text-align:left; padding:0.75rem 1rem; border-bottom:1px solid var(--border); }
+    .spec-table td { padding:0.75rem 1rem; border-bottom:1px solid var(--border); color:var(--muted); font-size:0.9rem; }
+    .spec-table td:first-child { color:var(--text); font-weight:500; }
+
+    .result-banner { background:var(--card-bg); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:4px; padding:1.5rem 2rem; margin:2rem 0; }
+    .result-banner p { color:var(--text); margin:0; font-size:1rem; }
+
+    .divider { width:100%; height:1px; background:var(--border); margin:0; }
+    footer { border-top:1px solid var(--border); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; }
+    footer p { font-family:'DM Mono',monospace; font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; }
+    ::-webkit-scrollbar { width:4px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:2px; }
+
+    .proj-img { width:100%; border-radius:4px; border:1px solid var(--border); display:block; margin:0; }
+    .img-caption { font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; text-align:center; margin-top:0.5rem; margin-bottom:1.5rem; }
+    .img-wrap { margin:1.5rem 0; }
+    .schematic-grid { display:grid; grid-template-columns:1fr; gap:1rem; margin:2rem 0; }
+    .wave-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin:2rem 0; }
+    .breadboard-wrap { margin:2rem 0; }
+
+    @media(max-width:768px) { nav{padding:1rem 1.5rem;} .project-hero{padding:8rem 1.5rem 3rem;} .content{padding:3rem 1.5rem;} footer{flex-direction:column;gap:0.5rem;text-align:center;} .hero-meta{gap:1.5rem;} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-logo" href="../index.html">AS — Portfolio</a>
+    <a class="nav-back" href="../index.html">← Back</a>
+  </nav>
+
+  <div class="project-hero">
+    <div class="project-hero-bg"></div>
+    <div class="project-hero-grid"></div>
+    <div class="hero-content">
+      <p class="hero-label">Project 01 · Sep–Dec 2025 · SYSC 3203 Bioelectrical Systems</p>
+      <h1 class="hero-title">EMG Signal Acquisition<br />&amp; <em>Control System</em></h1>
+      <p class="hero-subtitle">Analog Circuit Design · Biomedical · LTSpice · Breadboard</p>
+      <div class="hero-tags">
+        <span class="tag">LTSpice</span><span class="tag">Instrumentation Amplifier</span><span class="tag">Chebyshev BPF</span>
+        <span class="tag">Full Wave Rectifier</span><span class="tag">Integrator</span><span class="tag">Comparator</span>
+        <span class="tag">555 Timer</span><span class="tag">4N25 Optoisolator</span><span class="tag">Breadboard</span>
+      </div>
+      <div class="hero-meta">
+        <div class="meta-item"><p class="meta-label">Course</p><p class="meta-value">SYSC 3203 — Bioelectrical Systems</p></div>
+        <div class="meta-item"><p class="meta-label">Timeline</p><p class="meta-value">2 weeks (completed Dec 4, 2025)</p></div>
+        <div class="meta-item"><p class="meta-label">Outcome</p><p class="meta-value">Fully functional — played Flappy Bird</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <h2>Project <em>Overview</em></h2>
+    <p>The goal was to design a complete EMG-based human-computer interface: detect muscle contractions from surface electrodes, process the millivolt-level EMG signal through an 8-stage analog pipeline, and generate an electrically isolated digital output to trigger a mouse click — used to play Flappy Bird in real time.</p>
+    <p>The system had to detect EMG signals of <strong>5–10 mV</strong> from surface electrodes, amplify with high gain while rejecting common-mode noise, bandpass filter the EMG power band (30–300 Hz), and produce a clean, isolated click pulse for every detected muscle contraction.</p>
+
+    
+    <h2>LTSpice <em>Schematics</em></h2>
+    <p>The full signal chain was designed and simulated in LTSpice across three schematic sheets before being built on breadboard.</p>
+    <div class="schematic-grid">
+      <div class="img-wrap"><img src="emg-schematic-stages1-3.png" alt="Stages 1–3: Bioinstrumentation Amplifier, Bandpass Filter, Full Wave Rectifier" class="proj-img" /><p class="img-caption">Stages 1–3 · Bioinstrumentation Amp · Chebyshev BPF · Full Wave Rectifier</p></div>
+      <div class="img-wrap"><img src="emg-schematic-stages4-6.png" alt="Stages 4–6: Integrator, Comparator, Falling Edge Detector" class="proj-img" /><p class="img-caption">Stages 4–6 · Integrator · Comparator · Falling Edge Detector</p></div>
+      <div class="img-wrap"><img src="emg-schematic-stages7-8.png" alt="Stages 7–8: One-Shot 555 Timer, Optoisolator" class="proj-img" /><p class="img-caption">Stages 7–8 · NE555 One-Shot · 4N25 Optoisolator</p></div>
+    </div>
+
+    <h2>Breadboard <em>Implementation</em></h2>
+    <p>The complete 8-stage pipeline built on breadboard with color-coded wiring — each stage numbered and verified end-to-end.</p>
+    <div class="breadboard-wrap"><img src="emg-breadboard.png" alt="Completed 8-stage EMG breadboard" class="proj-img" /><p class="img-caption">Completed breadboard · All 8 stages · Color-coded wiring</p></div>
+<h2>System <em>Architecture</em></h2>
+    <p>The signal chain moves through 8 discrete analog stages, each designed and simulated in LTSpice before being built on breadboard. The final breadboard used color-coded wiring: green for battery ground, red for +5V, black for −5V, purple for stage outputs, and blue for inter-component connections.</p>
+
+    <div class="stage-grid">
+      <div class="stage-card">
+        <p class="stage-num">Stage 01</p>
+        <h3 class="stage-name">Bio-Instrumentation Amplifier</h3>
+        <p class="stage-detail">AD620 with RG = 200 Ω → gain of 248. Rejects common-mode noise from differential EMG electrodes. Floating reference ground modeled with R/C parallel (1 PΩ / 10 pF).</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 02</p>
+        <h3 class="stage-name">Bandpass Filter</h3>
+        <p class="stage-detail">Chebyshev topology. Low cutoff: 30 Hz, high cutoff: 300 Hz — matched to the primary EMG power band. Higher-order filters were considered but rejected due to added complexity.</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 03</p>
+        <h3 class="stage-name">Full Wave Rectifier</h3>
+        <p class="stage-detail">Converts the bipolar filtered EMG signal to a unipolar absolute value for downstream envelope detection.</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 04</p>
+        <h3 class="stage-name">Integrator / Envelope Detector</h3>
+        <p class="stage-detail">Smooths the rectified signal into an amplitude envelope proportional to muscle activation level.</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 05</p>
+        <h3 class="stage-name">Comparator</h3>
+        <p class="stage-detail">LT1011. Thresholds the envelope against a set reference voltage — outputs a digital HIGH when a contraction is detected.</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 06</p>
+        <h3 class="stage-name">Falling Edge Detector</h3>
+        <p class="stage-detail">Generates a narrow pulse on the falling edge of the comparator output — triggers exactly one event per contraction end.</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 07</p>
+        <h3 class="stage-name">One-Shot (555 Timer)</h3>
+        <p class="stage-detail">NE555 in monostable configuration. Produces a clean, fixed-width output pulse regardless of input noise, decoupling click duration from EMG signal variability.</p>
+      </div>
+      <div class="stage-card">
+        <p class="stage-num">Stage 08</p>
+        <h3 class="stage-name">Optoisolator</h3>
+        <p class="stage-detail">4N25. Provides full electrical isolation between the EMG circuit's floating ground and the computer's USB ground, safely triggering a mouse click without ground loop issues.</p>
+      </div>
+    </div>
+
+
+    <h2>Simulation <em>Waveforms</em></h2>
+    <p>LTSpice simulation output for each stage, showing the signal transformation from raw EMG input through to the final isolated click pulse.</p>
+    <div class="wave-grid">
+      <div class="img-wrap"><img src="emg-wave-bioinst-amp.png" alt="BioInstrumentation Amplifier output" class="proj-img" /><p class="img-caption">Stage 1 · BioInstrumentation Amplifier</p></div>
+      <div class="img-wrap"><img src="emg-wave-bandpass-filter.png" alt="Band Pass Filter output" class="proj-img" /><p class="img-caption">Stage 2 · Band Pass Filter (30–300 Hz)</p></div>
+      <div class="img-wrap"><img src="emg-wave-full-wave-rectifier.png" alt="Full Wave Rectifier output" class="proj-img" /><p class="img-caption">Stage 3 · Full Wave Rectifier</p></div>
+      <div class="img-wrap"><img src="emg-wave-envelope-detector.png" alt="Envelope Detector output" class="proj-img" /><p class="img-caption">Stage 4 · Envelope Detector</p></div>
+      <div class="img-wrap"><img src="emg-wave-comparator.png" alt="Comparator output" class="proj-img" /><p class="img-caption">Stage 5 · Comparator</p></div>
+      <div class="img-wrap"><img src="emg-wave-falling-edge-detector.png" alt="Falling Edge Detector output" class="proj-img" /><p class="img-caption">Stage 6 · Falling Edge Detector</p></div>
+      <div class="img-wrap"><img src="emg-wave-one-shot.png" alt="One Shot 555 Timer output" class="proj-img" /><p class="img-caption">Stage 7 · One-Shot (NE555)</p></div>
+      <div class="img-wrap"><img src="emg-wave-optoisolator.png" alt="Optoisolator output" class="proj-img" /><p class="img-caption">Stage 8 · Optoisolator Output</p></div>
+    </div>
+
+    <h2>Key Design <em>Decisions</em></h2>
+    <table class="spec-table">
+      <thead><tr><th>Parameter</th><th>Value</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td>Instrumentation Amp Gain</td><td>248 (RG = 200 Ω)</td><td>Lower gain of ~100 tested but insufficient signal amplitude for downstream stages</td></tr>
+        <tr><td>BPF Passband</td><td>30–300 Hz</td><td>Matched to main EMG spectral power band</td></tr>
+        <tr><td>Filter Topology</td><td>Chebyshev</td><td>Higher-order filters rejected — added complexity, more debug time</td></tr>
+        <tr><td>Ground Isolation</td><td>1 PΩ ‖ 10 pF</td><td>Models floating reference ground per 4N25 datasheet recommendation</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Noise <em>Rejection Validation</em></h2>
+    <p>The system was tested with three input conditions using <code>lab10_emg.txt</code>:</p>
+    <p><strong>60 Hz power line interference:</strong> Added as common-mode signal. The bioinstrumentation amplifier's high CMRR and the bandpass filter attenuated it — output plots were identical to the clean signal, confirming the noise was fully rejected.</p>
+    <p><strong>Baseline wandering and motion artifacts:</strong> Added as low-frequency components. The 30 Hz high-pass characteristic of the bandpass filter removed these artifacts, producing clean downstream outputs identical to the interference-free case.</p>
+
+    <div class="result-banner">
+      <p>The completed system successfully detected muscle contractions in real time and triggered isolated mouse clicks through the optoisolator — used to play Flappy Bird. The project was completed one day ahead of the December 5 deadline with full end-to-end functionality verified on breadboard.</p>
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:3rem;">
+      <a class="btn btn-ghost" href="../index.html#projects">← All Projects</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Abhinan Sajeendran</p>
+    <p>Biomedical &amp; Electrical Engineering · Carleton University</p>
+  </footer>
+</body>
+</html>
