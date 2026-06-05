@@ -108,14 +108,14 @@
     <h2>LTSpice <em>Schematics</em></h2>
     <p>The full signal chain was designed and simulated in LTSpice across three schematic sheets before being built on breadboard.</p>
     <div class="schematic-grid">
-      <div class="img-wrap"><img src="images/emg/emg-schematic-stages1-3.png" alt="Stages 1–3: Bioinstrumentation Amplifier, Bandpass Filter, Full Wave Rectifier" class="proj-img" /><p class="img-caption">Stages 1–3 · Bioinstrumentation Amp · Chebyshev BPF · Full Wave Rectifier</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-schematic-stages4-6.png" alt="Stages 4–6: Integrator, Comparator, Falling Edge Detector" class="proj-img" /><p class="img-caption">Stages 4–6 · Integrator · Comparator · Falling Edge Detector</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-schematic-stages7-8.png" alt="Stages 7–8: One-Shot 555 Timer, Optoisolator" class="proj-img" /><p class="img-caption">Stages 7–8 · NE555 One-Shot · 4N25 Optoisolator</p></div>
+      <div class="img-wrap"><img src="../emg-schematic-stages1-3.png" alt="Stages 1–3: Bioinstrumentation Amplifier, Bandpass Filter, Full Wave Rectifier" class="proj-img" /><p class="img-caption">Stages 1–3 · Bioinstrumentation Amp · Chebyshev BPF · Full Wave Rectifier</p></div>
+      <div class="img-wrap"><img src="../emg-schematic-stages4-6.png" alt="Stages 4–6: Integrator, Comparator, Falling Edge Detector" class="proj-img" /><p class="img-caption">Stages 4–6 · Integrator · Comparator · Falling Edge Detector</p></div>
+      <div class="img-wrap"><img src="../emg-schematic-stages7-8.png" alt="Stages 7–8: One-Shot 555 Timer, Optoisolator" class="proj-img" /><p class="img-caption">Stages 7–8 · NE555 One-Shot · 4N25 Optoisolator</p></div>
     </div>
 
     <h2>Breadboard <em>Implementation</em></h2>
     <p>The complete 8-stage pipeline built on breadboard with color-coded wiring — each stage numbered and verified end-to-end.</p>
-    <div class="breadboard-wrap"><img src="images/emg/emg-breadboard.png" alt="Completed 8-stage EMG breadboard" class="proj-img" /><p class="img-caption">Completed breadboard · All 8 stages · Color-coded wiring</p></div>
+    <div class="breadboard-wrap"><img src="../emg-breadboard.png" alt="Completed 8-stage EMG breadboard" class="proj-img" /><p class="img-caption">Completed breadboard · All 8 stages · Color-coded wiring</p></div>
 <h2>System <em>Architecture</em></h2>
     <p>The signal chain moves through 8 discrete analog stages, each designed and simulated in LTSpice before being built on breadboard. The final breadboard used color-coded wiring: green for battery ground, red for +5V, black for −5V, purple for stage outputs, and blue for inter-component connections.</p>
 
@@ -166,14 +166,14 @@
     <h2>Simulation <em>Waveforms</em></h2>
     <p>LTSpice simulation output for each stage, showing the signal transformation from raw EMG input through to the final isolated click pulse.</p>
     <div class="wave-grid">
-      <div class="img-wrap"><img src="images/emg/emg-wave-bioinst-amp.png" alt="BioInstrumentation Amplifier output" class="proj-img" /><p class="img-caption">Stage 1 · BioInstrumentation Amplifier</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-bandpass-filter.png" alt="Band Pass Filter output" class="proj-img" /><p class="img-caption">Stage 2 · Band Pass Filter (30–300 Hz)</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-full-wave-rectifier.png" alt="Full Wave Rectifier output" class="proj-img" /><p class="img-caption">Stage 3 · Full Wave Rectifier</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-envelope-detector.png" alt="Envelope Detector output" class="proj-img" /><p class="img-caption">Stage 4 · Envelope Detector</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-comparator.png" alt="Comparator output" class="proj-img" /><p class="img-caption">Stage 5 · Comparator</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-falling-edge-detector.png" alt="Falling Edge Detector output" class="proj-img" /><p class="img-caption">Stage 6 · Falling Edge Detector</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-one-shot.png" alt="One Shot 555 Timer output" class="proj-img" /><p class="img-caption">Stage 7 · One-Shot (NE555)</p></div>
-      <div class="img-wrap"><img src="images/emg/emg-wave-optoisolator.png" alt="Optoisolator output" class="proj-img" /><p class="img-caption">Stage 8 · Optoisolator Output</p></div>
+      <div class="img-wrap"><img src="../emg-wave-bioinst-amp.png" alt="BioInstrumentation Amplifier output" class="proj-img" /><p class="img-caption">Stage 1 · BioInstrumentation Amplifier</p></div>
+      <div class="img-wrap"><img src="../emg-wave-bandpass-filter.png" alt="Band Pass Filter output" class="proj-img" /><p class="img-caption">Stage 2 · Band Pass Filter (30–300 Hz)</p></div>
+      <div class="img-wrap"><img src="../emg-wave-full-wave-rectifier.png" alt="Full Wave Rectifier output" class="proj-img" /><p class="img-caption">Stage 3 · Full Wave Rectifier</p></div>
+      <div class="img-wrap"><img src="../emg-wave-envelope-detector.png" alt="Envelope Detector output" class="proj-img" /><p class="img-caption">Stage 4 · Envelope Detector</p></div>
+      <div class="img-wrap"><img src="../emg-wave-comparator.png" alt="Comparator output" class="proj-img" /><p class="img-caption">Stage 5 · Comparator</p></div>
+      <div class="img-wrap"><img src="../emg-wave-falling-edge-detector.png" alt="Falling Edge Detector output" class="proj-img" /><p class="img-caption">Stage 6 · Falling Edge Detector</p></div>
+      <div class="img-wrap"><img src="../emg-wave-one-shot.png" alt="One Shot 555 Timer output" class="proj-img" /><p class="img-caption">Stage 7 · One-Shot (NE555)</p></div>
+      <div class="img-wrap"><img src="../emg-wave-optoisolator.png" alt="Optoisolator output" class="proj-img" /><p class="img-caption">Stage 8 · Optoisolator Output</p></div>
     </div>
 
     <h2>Key Design <em>Decisions</em></h2>
